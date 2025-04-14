@@ -1,6 +1,8 @@
+import com.android.manifmerger.Actions.load
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import java.util.Properties
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
@@ -33,6 +35,7 @@ kotlin {
         androidMain.dependencies {
             implementation(compose.preview)
             implementation(libs.androidx.activity.compose)
+            implementation(libs.yandex.maps)
         }
         commonMain.dependencies {
             implementation(compose.runtime)
@@ -52,12 +55,25 @@ android {
     namespace = "components.box.cmp"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
 
+    val localProperties = Properties()
+    val localPropertiesFile = rootProject.file("local.properties")
+    if (localPropertiesFile.exists()) {
+        localProperties.load(localPropertiesFile.inputStream())
+    }
+
+    val yandexApiKey = localProperties.getProperty("YANDEX_MAPS_API_KEY")
+
     defaultConfig {
         applicationId = "components.box.cmp"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
         versionCode = 1
         versionName = "1.0"
+
+        buildConfigField("String", "YANDEX_MAPS_API_KEY", yandexApiKey)
+        buildFeatures {
+            buildConfig = true
+        }
     }
     packaging {
         resources {
