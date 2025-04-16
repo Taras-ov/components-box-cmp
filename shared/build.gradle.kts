@@ -4,6 +4,7 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidLibrary)
+    alias(libs.plugins.kotlinCocoapods)
 }
 
 kotlin {
@@ -13,16 +14,31 @@ kotlin {
             jvmTarget.set(JvmTarget.JVM_11)
         }
     }
-    
+
     iosX64()
     iosArm64()
     iosSimulatorArm64()
-    
+
     jvm()
-    
+
+    cocoapods {
+        version = "1.0.0"
+        summary = "My Shared Module"
+        homepage = "https://github.com/Taras-ov/components-box-cmp"
+        ios.deploymentTarget = "13.0"
+        podfile = project.file("../iosApp/Podfile")
+
+
+        framework {
+            baseName = "shared"
+            isStatic = false
+        }
+    }
+
     sourceSets {
         commonMain.dependencies {
-            // put your Multiplatform dependencies here
+            implementation(libs.compose.ui)
+            implementation(libs.compose.foundation)
         }
     }
 }
